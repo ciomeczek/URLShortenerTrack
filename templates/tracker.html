@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker</title>
+    <style>
+        section {
+            margin-left: 20px;
+        }
+
+        .visit{
+            border: 2px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <p>URL: {{context.url}}</p>
+    <p>Shortened URL: {{context.domain}}{{context.shortened_url}}</p>
+    <p>Tracker URL: {{context.domain}}tracker/{{context.tracker_url}}</p>
+    <p>Visits: </p>
+    <section>
+        {% for visit in context.visits %}
+        <div class="visit">
+            <p>IP: {{visit.ip}}</p>
+            <p>User agent: {{visit.user_agent}}</p>
+            <p>Visited at: {{visit.created_at}}</p>
+        </div>
+        {% endfor %}
+    </section>
+</body>
+
+</html>
