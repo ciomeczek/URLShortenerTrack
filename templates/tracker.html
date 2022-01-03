@@ -1,36 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tracker</title>
     <style>
-        section {
-            margin-left: 20px;
-        }
+      section {
+        margin-left: 20px;
+      }
 
-        .visit{
-            border: 2px solid black;
-        }
+      .visit {
+        border: 2px solid black;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <p>URL: {{context.url}}</p>
     <p>Shortened URL: {{context.domain}}{{context.shortened_url}}</p>
     <p>Tracker URL: {{context.domain}}tracker/{{context.tracker_url}}</p>
-    <p>Visits: </p>
-    <section>
-        {% for visit in context.visits %}
-        <div class="visit">
-            <p>IP: {{visit.ip}}</p>
-            <p>User agent: {{visit.user_agent}}</p>
-            <p>Visited at: {{visit.created_at}}</p>
-        </div>
-        {% endfor %}
+    <p>Visits:</p>
+    <section id="visits">
+      {% for visit in context.visits %}
+      <div class="visit">
+        <p>IP: {{visit.ip}}</p>
+        <p>User agent: {{visit.user_agent}}</p>
+        <p>Visited at: {{visit.created_at}}</p>
+      </div>
+      {% endfor %}
     </section>
-</body>
 
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const room = "{{context.tracker_url}}";
+      let visits = {{context.visits|tojson}};
+
+      var socket = io();
+
+      socket.on("connect", function () {
+        socket.emit("join", { username: "ciomek", room: room });
+      });
+
+      socket.on("tracker_data", function (data) {
+        addVisit(data);
+      });
+
+      function addVisit(data)
+      {
+        div = document.createElement("div");
+        div.className = "visit";
+
+        div.innerHTML = `
+          <p>IP: ${data.ip}</p>
+          <p>User agent: ${data.user_agent}</p>
+          <p>Visited at: ${data.created_at}</p>`;
+          
+        document.querySelector('#visits').appendChild(div);
+      }
+    </script>
+  </body>
 </html>

@@ -16,9 +16,9 @@ def add_url(url):
     return tracker_url
 
 
-def get_url(shortened_url):
+def get_urls(shortened_url):
     sql = """
-        SELECT url FROM url WHERE shortened_url = ?
+        SELECT url, shortened_url, tracker_url FROM url WHERE shortened_url = ?
     """
     cursor.execute(sql, (shortened_url,))
 
@@ -27,8 +27,7 @@ def get_url(shortened_url):
     if res is None:
         return None
 
-    url = res.get('url')
-    return url
+    return res
 
 
 def get_tracker_data(tracker_url):
@@ -76,3 +75,14 @@ def track_user(shortened_url, user_ip, user_agent):
 
     cursor.execute(sql, (url_id, user_ip, user_agent))
     cursor.connection.commit()
+
+    visit_id = cursor.lastrowid
+
+    sql = """
+        SELECT ip, user_agent, created_at FROM visit WHERE visit_id = ?
+    """
+
+    cursor.execute(sql, (visit_id,))
+    visit = cursor.fetchone()
+
+    return visit

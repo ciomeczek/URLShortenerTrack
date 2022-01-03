@@ -1,6 +1,6 @@
 import re
-from server import app
-from sql.methods import add_url, get_url, get_tracker_data, track_user
+from server import app, socketio
+from sql.methods import add_url, get_urls, get_tracker_data, track_user
 from flask import request, render_template, redirect
 
 
@@ -25,13 +25,16 @@ def create_url():
 def redirect_to_url(shortened_url):
     ip = request.remote_addr
     user_agent = request.headers.get('User-Agent')
-    track_user(shortened_url, user_ip=ip, user_agent=user_agent)
-    url = get_url(shortened_url)
+    tracker_data = track_user(shortened_url, user_ip=ip, user_agent=user_agent)
 
-    if url is None:
+    urls = get_urls(shortened_url)
+
+    if urls is None:
         return render_template('404.html')
 
-    return redirect(url)
+    socketio.emit('tracker_data', tracker_data, to=urls['tracker_url'])
+
+    return redirect(urls['url'])
 
 
 @app.route("/tracker/<tracker_url>/", methods=["GET"])

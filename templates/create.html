@@ -1,15 +1,42 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create</title>
+    <style>
+        #error {
+            color: red;
+        }
+    </style>
 </head>
+
 <body>
-    <form action="/" method="post">
-        <input type="text" name="url" placeholder="url...">
-        <input type="submit" value="submit">
+    <form action="/" method="post" onsubmit="return validateForm()" name="url-form">
+        <input type="text" name="url" placeholder="url..." onkeydown="resetError()" />
+        <input type="submit" value="submit" />
     </form>
+    <p id="error"></p>
+
+    <script>
+        function validateForm() {
+            const url = document.forms["url-form"]["url"].value;
+
+            const regex =
+                /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+
+            if (!url.match(regex)) {
+                document.querySelector("#error").innerHTML = "Invalid URL";
+                return false;
+            }
+        }
+
+        function resetError() {
+            document.querySelector("#error").innerHTML = "";
+        }
+    </script>
 </body>
+
 </html>
