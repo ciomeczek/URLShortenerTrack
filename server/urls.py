@@ -44,3 +44,8 @@ def tracker(tracker_url):
     domain = request.url_root
     tracker_data['domain'] = domain
     return render_template('tracker.html', context=tracker_data)
+
+
+@app.errorhandler(404)
+def page_not_found():
+    return render_template('404.html')
