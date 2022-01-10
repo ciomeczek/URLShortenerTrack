@@ -1,3 +1,4 @@
+import httpagentparser
 from . import cursor
 import uuid
 
@@ -49,6 +50,9 @@ def get_tracker_data(tracker_url):
     cursor.execute(sql, (tracker_data.get('url_id'),))
     visits = cursor.fetchall()
 
+    for visit in visits:
+        visit['user_agent_data'] = httpagentparser.detect(visit['user_agent'])
+
     tracker_data['visits'] = visits
 
     return tracker_data
@@ -84,5 +88,7 @@ def track_user(shortened_url, user_ip, user_agent):
 
     cursor.execute(sql, (visit_id,))
     visit = cursor.fetchone()
+
+    visit['user_agent_data'] = httpagentparser.detect(visit['user_agent'])
 
     return visit

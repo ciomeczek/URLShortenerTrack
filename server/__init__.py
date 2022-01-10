@@ -5,7 +5,7 @@ from flask_socketio import SocketIO
 
 load_dotenv()
 
-app = Flask(__name__, template_folder='../templates')
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 socketio = SocketIO(app)

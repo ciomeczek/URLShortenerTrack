@@ -1,67 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tracker</title>
-    <style>
-      section {
-        margin-left: 20px;
-      }
 
-      .visit {
-        border: 2px solid black;
-      }
-    </style>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/tracker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/header.css') }}">
+  <title>Tracker</title>
+</head>
 
-  <body>
-    <p>URL: {{context.url}}</p>
-    <p>Shortened URL: {{context.domain}}{{context.shortened_url}}</p>
-    <p>Tracker URL: {{context.domain}}tracker/{{context.tracker_url}}</p>
-    <p>Visits:</p>
-    <section id="visits">
-      {% for visit in context.visits %}
-      <div class="visit">
-        <p>IP: {{visit.ip}}</p>
-        <p>User agent: {{visit.user_agent}}</p>
-        <p>Visited at: {{visit.created_at}}</p>
-      </div>
-      {% endfor %}
-    </section>
+<body>
+  <header>
+    <h1><a href="/">Tracker</a></h1>
+  </header>
+  <table>
+    <tr>
+      <th>URL:</th>
+      <td>{{context.url}}</td>
+    </tr>
+    <tr>
+      <th>Shortened URL:</th>
+      <td>{{context.domain}}{{context.shortened_url}}</td>
+    </tr>
+    <tr>
+      <th>Tracker URL:</th>
+      <td>{{context.domain}}tracker/{{context.tracker_url}}</td>
+    </tr>
+  </table>
+  </table>
+  <table id="visits">
+    <tr>
+      <th>IP:</th>
+      <th>User agent:</th>
+      <th>Browser:</th>
+      <th>OS:</th>
+      <th>Visited at:</th>
+    </tr>
+    {% for visit in context.visits %}
+    <tr>
+      <td>{{visit.ip}}</td>
+      <td>{{visit.user_agent}}</td>
+      <td>{{ visit.user_agent_data.browser.name }} {{visit.user_agent_data.browser.version}}</td>
+      <td>{{ visit.user_agent_data.os.name }}</td>
+      <td>{{visit.created_at}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  </section>
 
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
-      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
-      crossorigin="anonymous"
-    ></script>
-    <script>
-      const room = "{{context.tracker_url}}";
-      let visits = {{context.visits|tojson}};
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+    integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+    crossorigin="anonymous"></script>
+  <script>
+    const room = "{{context.tracker_url}}";
+    let visits = {{ context.visits | tojson }};
 
-      var socket = io();
+    var socket = io();
 
-      socket.on("connect", function () {
-        socket.emit("join", { username: "ciomek", room: room });
+    socket.on("connect", () => {
+      socket.emit("join", {
+        room: room
       });
+    });
 
-      socket.on("tracker_data", function (data) {
-        addVisit(data);
-      });
+    socket.on("tracker_data", (data) => {
+      addVisit(data);
+    });
 
-      function addVisit(data)
-      {
-        div = document.createElement("div");
-        div.className = "visit";
+    function addVisit(data) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+          <td>${data.ip}</td>
+          <td>${data.user_agent}</td>
+          <td>${data.user_agent_data.browser.name} ${data.user_agent_data.browser.version}</td>
+          <td>${data.user_agent_data.os.name}</td>
+          <td>${data.created_at}</td>
+        `;
 
-        div.innerHTML = `
-          <p>IP: ${data.ip}</p>
-          <p>User agent: ${data.user_agent}</p>
-          <p>Visited at: ${data.created_at}</p>`;
-          
-        document.querySelector('#visits').appendChild(div);
-      }
-    </script>
-  </body>
+      document.querySelector('#visits').appendChild(tr);
+    }
+  </script>
+</body>
+
 </html>
