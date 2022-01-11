@@ -92,3 +92,12 @@ def track_user(shortened_url, user_ip, user_agent):
     visit['user_agent_data'] = httpagentparser.detect(visit['user_agent'])
 
     return visit
+
+
+def delete_old_urls():
+    sql = """
+        DELETE FROM url WHERE created_at < datetime('now', '-3 day')
+    """
+
+    cursor.execute(sql)
+    cursor.connection.commit()

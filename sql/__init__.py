@@ -9,6 +9,8 @@ def __dict_factory(cur, row):
 
 
 connection = sqlite3.connect('db.sqlite3', check_same_thread=False)
+connection.execute("PRAGMA foreign_keys = 1")
+
 connection.row_factory = __dict_factory
 
 cursor = connection.cursor()

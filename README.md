@@ -24,7 +24,8 @@ sqlite3 db.sqlite3 "
         url_id INTEGER PRIMARY KEY,
         url TEXT NOT NULL,
         shortened_url TEXT NOT NULL,
-        tracker_url TEXT NOT NULL
+        tracker_url TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
     
     CREATE TABLE visit (
@@ -33,7 +34,7 @@ sqlite3 db.sqlite3 "
         ip VARCHAR(15) NOT NULL,
         user_agent VARCHAR(255) NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (url_id) REFERENCES url (url_id)
+        FOREIGN KEY (url_id)  REFERENCES url (url_id) ON DELETE CASCADE
     );
 ";
 ```
